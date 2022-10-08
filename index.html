@@ -386,7 +386,7 @@ for( let x = 0; x < columns; x++ ) {
 }
  
 for (let y=0;y<rows;y++){
-	windDrops[y]=1
+	windDrops[y]=1;
 }
 
 const draw = () => {
@@ -412,14 +412,14 @@ const horizontal=()=>{
 	ctx.fillStyle='rgba(0,0,0,0.05)';
 	ctx.fillRect(0,0,matrix.width,matrix.height);
 	ctx.fillStyle=colorLetter;
-	ctx.font=anotherFontSize+'px monospace';
+	ctx.font=anotherFontSize*2+'px monospace';
 	for( let i=0;i<windDrops.length;i++){
 		const text=alphabet.charAt(Math.floor(Math.random()*alphabet.length));
 		ctx.fillText(text,i*anotherFontSize,windDrops[i]*anotherFontSize);
 		if(windDrops[i]*anotherFontSize>matrix.height&&Math.random()>0.975){
-			windDrops[i]=-1;
+			windDrops[i]=1;
 		}
-		windDrops[i]+=2;
+		windDrops[i]+=20;
 	}
 }
 setInterval(draw, 100);
