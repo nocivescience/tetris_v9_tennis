@@ -22,7 +22,7 @@
   </style>
 </head>
 <body>
-<canvas width="320" height="640" id="game"></canvas>
+<canvas width="960" height="640" id="game"></canvas>
 <script>
 // https://tetris.fandom.com/wiki/Tetris_Guideline
 
@@ -38,7 +38,7 @@ function getRandomInt(min, max) {
 // generate a new tetromino sequence
 // @see https://tetris.fandom.com/wiki/Random_Generator
 function generateSequence() {
-  const sequence = ['I', 'J', 'L', 'O', 'S', 'T', 'Z'];
+  const sequence = ['I', 'J', 'L', 'O', 'S', 'T', 'Z','U'];
 
   while (sequence.length) {
     const rand = getRandomInt(0, sequence.length - 1);
@@ -72,7 +72,7 @@ function getNextTetromino() {
 
 // rotate an NxN matrix 90deg
 // @see https://codereview.stackexchange.com/a/186834
-function rotate(matrix) {
+function rotate(matrix,prueba=true) {
   const N = matrix.length - 1;
   const result = matrix.map((row, i) =>
     row.map((val, j) => matrix[N - j][i])
@@ -163,10 +163,10 @@ const tetrominoSequence = [];
 const playfield = [];
 
 // populate the empty state
-for (let row = -2; row < 20; row++) {
+for (let row = -2; row < canvas.height/grid; row++) {
   playfield[row] = [];
 
-  for (let col = 0; col < 10; col++) {
+  for (let col = 0; col <canvas.width/grid; col++) {
     playfield[row][col] = 0;
   }
 }
@@ -208,7 +208,12 @@ const tetrominos = {
     [0,1,0],
     [1,1,1],
     [0,0,0],
-  ]
+  ],
+  'U': [
+    [1,1,1],
+    [1,0,1],
+    [0,0,0],
+]
 };
 
 // color of each tetromino
@@ -233,8 +238,8 @@ function loop() {
   context.clearRect(0,0,canvas.width,canvas.height);
 
   // draw the playfield
-  for (let row = 0; row < 20; row++) {
-    for (let col = 0; col < 10; col++) {
+  for (let row = 0; row < canvas.height/grid; row++) {
+    for (let col = 0; col < canvas.width/grid; col++) {
       if (playfield[row][col]) {
         const name = playfield[row][col];
         context.fillStyle = colors[name];
