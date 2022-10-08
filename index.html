@@ -4,30 +4,45 @@
   <title>Basic Tetris HTML Game</title>
   <meta charset="UTF-8">
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
   html, body {
     height: 100%;
     margin: 0;
+    font-family: 'VT323', monospace;
+    position: relative;
   }
 
   body {
     background: black;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
   }
 
-  canvas {
+  #game {
     border: 1px solid white;
+  }
+  h1{
+    color: greenyellow;
+  }
+  #matrix{
+    position: absolute;
+    opacity: .3;
   }
   </style>
 </head>
 <body>
-<canvas width="960" height="640" id="game"></canvas>
+<h1></h1>
+<canvas id="matrix"></canvas>
+<canvas width="320" height="608" id="game"></canvas>
 <script>
 // https://tetris.fandom.com/wiki/Tetris_Guideline
 
 // get a random integer between the range of [min,max]
 // @see https://stackoverflow.com/a/1527820/2124254
+const scoreEl=document.querySelector('h1');
+let =opacity=.7;
 function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -49,6 +64,8 @@ function generateSequence() {
 
 // get the next tetromino in the sequence
 function getNextTetromino() {
+  clicks=0;
+  context.globalAlpha=opacity;
   if (tetrominoSequence.length === 0) {
     generateSequence();
   }
@@ -73,13 +90,21 @@ function getNextTetromino() {
 // rotate an NxN matrix 90deg
 // @see https://codereview.stackexchange.com/a/186834
 function rotate(matrix) {
-  const N = matrix.length - 1;
-  const result = matrix.map((row, i) =>
-    row.map((val, j) => matrix[N - j][i])
-  );
-
-  return result;
-}
+    if(clicks<5){
+        const N = matrix.length - 1;
+        const result = matrix.map((row, i) =>
+            row.map((val, j) => matrix[N - j][i])
+        )
+        return result
+    }else{
+        const N = matrix.length - 1;
+        const result = matrix.map((row, i) =>
+            row.map((val, j) => matrix[i][j])
+        )
+        return result
+    }
+    
+};
 
 // check to see if the new matrix/row/col is valid
 function isValidMove(matrix, cellRow, cellCol) {
@@ -111,7 +136,6 @@ function placeTetromino() {
         if (tetromino.row + row < 0) {
           return showGameOver();
         }
-
         playfield[tetromino.row + row][tetromino.col + col] = tetromino.name;
       }
     }
@@ -120,7 +144,8 @@ function placeTetromino() {
   // check for line clears starting from the bottom and working our way up
   for (let row = playfield.length - 1; row >= 0; ) {
     if (playfield[row].every(cell => !!cell)) {
-
+        score+=10;
+        getScore()
       // drop every row above this one
       for (let r = row; r >= 0; r--) {
         for (let c = 0; c < playfield[r].length; c++) {
@@ -157,6 +182,8 @@ const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 const grid = 32;
 const tetrominoSequence = [];
+let clicks=0;
+let score=0;
 
 // keep track of what is in every cell of the game using a 2d array
 // tetris playfield is 10x20, with a few rows offscreen
@@ -220,17 +247,23 @@ const tetrominos = {
 const colors = {
   'I': 'cyan',
   'O': 'yellow',
-  'T': 'purple',
+  'T': 'aquamarine',
   'S': 'green',
-  'Z': 'red',
-  'J': 'blue',
-  'L': 'orange'
+  'Z': 'brown',
+  'J': 'antiquewhite',
+  'L': 'orange',
+  'U': 'white',
 };
 
 let count = 0;
 let tetromino = getNextTetromino();
 let rAF = null;  // keep track of the animation frame so we can cancel it
 let gameOver = false;
+
+//score
+function getScore(){
+    scoreEl.innerText=`Score: ${score}`;
+}
 
 // game loop
 function loop() {
@@ -243,7 +276,7 @@ function loop() {
       if (playfield[row][col]) {
         const name = playfield[row][col];
         context.fillStyle = colors[name];
-
+        
         // drawing 1 px smaller than the grid creates a grid effect
         context.fillRect(col * grid, row * grid, grid-1, grid-1);
       }
@@ -252,11 +285,13 @@ function loop() {
 
   // draw the active tetromino
   if (tetromino) {
-
-    // tetromino falls every 35 frames //ULTRA IMPORTANTE!!!!!!!
-    if (++count > 35) {
-      tetromino.row++;
-      count = 0;
+      // tetromino falls every 35 frames //ULTRA IMPORTANTE!!!!!!!
+      if (++count > 35) {
+          tetromino.row++;
+          if(score>40){
+            tetromino.row+=5;
+          }
+          count = 0;
 
       // place piece if it runs into anything
       if (!isValidMove(tetromino.matrix, tetromino.row, tetromino.col)) {
@@ -266,6 +301,7 @@ function loop() {
     }
 
     context.fillStyle = colors[tetromino.name];
+    context.globalAlpha=opacity-tetromino.row/(canvas.height/grid);
 
     for (let row = 0; row < tetromino.matrix.length; row++) {
       for (let col = 0; col < tetromino.matrix[row].length; col++) {
@@ -293,9 +329,10 @@ document.addEventListener('keydown', function(e) {
       tetromino.col = col;
     }
   }
-
+    
   // up arrow key (rotate)
   if (e.which === 38) {
+    clicks++;
     const matrix = rotate(tetromino.matrix);
     if (isValidMove(matrix, tetromino.row, tetromino.col)) {
       tetromino.matrix = matrix;
@@ -319,6 +356,76 @@ document.addEventListener('keydown', function(e) {
 
 // start the game
 rAF = requestAnimationFrame(loop);
+getScore();
+</script>
+<script>
+    const matrix = document.getElementById('matrix');
+    const ctx = matrix.getContext('2d');
+
+matrix.width = window.innerWidth;
+matrix.height = window.innerHeight;
+
+// const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+const latin0 = 'Te Amo Claudia';
+const latin=latin0.toLowerCase()+latin0;
+const apruebo='Apruebo';
+const nums = '0123456789';
+const colorLetter='white';
+
+const alphabet = latin;
+
+const fontSize = 26;
+const anotherFontSize=10;
+const columns = matrix.width/fontSize;
+const rows= matrix.width/anotherFontSize;
+
+const rainDrops = [];
+
+const windDrops=[];
+
+for( let x = 0; x < columns; x++ ) {
+	rainDrops[x] = 1;
+}
+ 
+for (let y=0;y<rows;y++){
+	windDrops[y]=1
+}
+
+const draw = () => {
+	ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+	ctx.fillRect(0, 0, matrix.width, matrix.height);
+	
+	ctx.fillStyle = colorLetter;
+	ctx.font = fontSize + 'px monospace';
+
+	for(let i = 0; i < rainDrops.length; i++)
+	{
+		const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+		ctx.fillText(text, i*fontSize, rainDrops[i]*fontSize);
+		
+		if(rainDrops[i]*fontSize > matrix.height && Math.random() > 0.975){
+			rainDrops[i] = 1;
+        }
+		rainDrops[i]++;
+	}
+};
+
+const horizontal=()=>{
+	ctx.fillStyle='rgba(0,0,0,0.05)';
+	ctx.fillRect(0,0,matrix.width,matrix.height);
+	ctx.fillStyle=colorLetter;
+	ctx.font=anotherFontSize+'px monospace';
+	for( let i=0;i<windDrops.length;i++){
+		const text=alphabet.charAt(Math.floor(Math.random()*alphabet.length));
+		ctx.fillText(text,i*anotherFontSize,windDrops[i]*anotherFontSize);
+		if(windDrops[i]*anotherFontSize>matrix.height&&Math.random()>0.975){
+			windDrops[i]=1;
+		}
+		windDrops[i]+=2;
+	}
+}
+setInterval(draw, 100);
+setInterval(horizontal,80);
 </script>
 </body>
 </html>
