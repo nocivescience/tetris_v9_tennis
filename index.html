@@ -72,7 +72,7 @@ function getNextTetromino() {
 
 // rotate an NxN matrix 90deg
 // @see https://codereview.stackexchange.com/a/186834
-function rotate(matrix,prueba=true) {
+function rotate(matrix) {
   const N = matrix.length - 1;
   const result = matrix.map((row, i) =>
     row.map((val, j) => matrix[N - j][i])
