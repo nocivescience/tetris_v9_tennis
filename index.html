@@ -10,6 +10,7 @@
     margin: 0;
     font-family: 'VT323', monospace;
     position: relative;
+    overflow: hidden;
   }
 
   body {
@@ -416,7 +417,7 @@ const horizontal=()=>{
 		const text=alphabet.charAt(Math.floor(Math.random()*alphabet.length));
 		ctx.fillText(text,i*anotherFontSize,windDrops[i]*anotherFontSize);
 		if(windDrops[i]*anotherFontSize>matrix.height&&Math.random()>0.975){
-			windDrops[i]=1;
+			windDrops[i]=-1;
 		}
 		windDrops[i]+=2;
 	}
