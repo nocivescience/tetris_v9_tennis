@@ -289,7 +289,7 @@ function loop() {
       if (++count > 35) {
           tetromino.row++;
           if(score>40){
-            tetromino.row+=5;
+            tetromino.row+=3;
           }
           count = 0;
 
@@ -365,7 +365,6 @@ getScore();
 matrix.width = window.innerWidth;
 matrix.height = window.innerHeight;
 
-// const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
 const latin0 = 'Te Amo Claudia';
 const latin=latin0.toLowerCase()+latin0;
 const apruebo='Apruebo';
